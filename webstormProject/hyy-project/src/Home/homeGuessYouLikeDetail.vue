@@ -19,29 +19,38 @@
                             <text style="color: darkgray;font-size: 28px;margin-right: 20px;margin-top: 10px;lines:2;text-overflow:ellipsis">{{food.subTitle}}</text>
                             <div style="flex-direction: row;justify-content: space-between;margin-top: 10px">
                                 <text style="color: crimson;font-size: 28px">月售{{food.sellCount}}</text>
-                                <text style="color: black;font-size: 28px;margin-right: 20px">{{food.price}}</text>
+                                <Cartcontrol :food="food" @addCart="addCart" />
                             </div>
+                            <text style="color: black;font-size: 28px;margin-top: 20px">￥{{food.price}}</text>
                         </div>
                     </div>
                     <div style="flex: 1;height: 1px;background-color: #c4c4c4;margin-top: 20px"></div>
                 </div>
             </cell>
         </list>
+        <Shopcart ref="shopcart"></Shopcart>
     </div>
 </template>
 
 <script>
-
+    import Shopcart from '../components/shopcart.vue';
+    import Cartcontrol from '../components/cartcontrol.vue';
     var navigator = weex.requireModule('navigator');
     var globalDefine = require('../globalDefine');
     var homeBottomCommonCell = require('./homeBottomCommonCell');
     var homeHotData = require('../resource/gusyoulikedetailTemp');
+    
 
     var stream = weex.requireModule('stream');
     const modal = weex.requireModule('modal');
     const dom = weex.requireModule('dom');
 
     export default {
+        props: {
+            seller: {
+                type: Object
+            }
+        },
         data () {
             return{
                 rightViewBtttomImage:globalDefine.apiUrl.resUrl + 'cnxh.png',
@@ -50,6 +59,17 @@
             }
         },
         computed: {
+            selectFoods() {
+                let foods = []
+                this.goods.forEach((good) => {
+                    good.foods.forEach((food) => {
+                    if (food.count) {
+                        foods.push(food)
+                    }
+                    })
+                })
+                return foods
+            },
             currentIndex() { // 计算出要高亮的index，即是要高亮的meun-warpper的index,也就是在那个高度区间
                 for (let i = 0; i < this.listHeight.length; i++) {
                     let height1 = this.listHeight[i]
@@ -73,9 +93,26 @@
             }
         },
         components:{
-            homeBottomCommonCell
+            homeBottomCommonCell,
+            Cartcontrol,
+            Shopcart
         },
         created(){
+            this.lists = this.lists.map(item => {
+                return {
+                    name: item.name,
+                    price: item.price,
+                    oldPrice: item.oldPrice,
+                    description: item.description,
+                    sellCount: item.sellCount,
+                    rating: item.rating,
+                    info: item.info,
+                    icon: item.icon,
+                    image: item.image,
+                    count: 0
+                }
+               
+            })
             const self = this;
             this.listHeight = 4 * 220 + 3 +'px';
         },
@@ -87,6 +124,9 @@
                 }else{
                     return url.replace('w.h', '240.180');
                 }
+            },
+            addCart(){
+
             },
             onappear (event) {
             },

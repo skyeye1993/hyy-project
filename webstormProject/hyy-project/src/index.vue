@@ -12,6 +12,7 @@ import Home from '@/Home/Home'
 import shop from '@/Shop/Shop'
 import mine from '@/Mine/Mine'
 import more from '@/More/More'
+
 export default {
   name: 'App',
   components: {
@@ -28,7 +29,8 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang='scss'>
+
   .wrapper {
      /*justify-content: center;
     align-items: center;*/

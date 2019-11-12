@@ -1,0 +1,10 @@
+```git配置
+#忽略依赖包
+/node_modules
+/platforms/*
+/plugins/*
+/dist/
+/temp/
+assets/tools/
+.vscode
+```
