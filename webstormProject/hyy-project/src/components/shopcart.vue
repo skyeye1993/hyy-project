@@ -58,22 +58,123 @@
         </div>
       </div>
     </transition>
+      <transition name="fade">
+      <div class="list-mask" v-show="listShow" @click="toggleList"></div>
+    </transition>
   </div>
 </template>
 
 
 <script>
 export default {
+    data() {
+    return {
+      balls: [{ // 存储可以被开始动画的小球，false的才能开始将其转变为true开始动画！而transition动画只对v-if，v-show和v-for有效
+        show: false
+      }, {
+        show: false
+      }, {
+        show: false
+      }, {
+        show: false
+      }, {
+        show: false
+      }],
+      dropBalls: [],
+        // 存储已经进入运动的小球，待小球运动完，将其style.display设置为none
+      fold: true // 该变量表示shopcart-list是否折叠
+    }
+  },
   props: {
-    food: { // 购物车按钮的信息由父组件传入
-      type: Object
+    selectFoods: { // 购物车的所有状态都依赖selectFoods这个属性，该属性由父元素传递进来
+      type: Array,
+      default () { // Vue中props为引用类型，default要用函数
+        return [{
+          price: 10,
+          count: 2
+        }]
+      }
+    },
+    deliveryPrice: {
+      type: Number, // Vue编程风格，接收数据要指定类型
+      default: 0 // 默认值设置为0
+    },
+    minPrice: {
+      type: Number, // Vue编程风格，接收数据要指定类型
+      default: 0 // 默认值设置为0
     }
   },
   created() {
     // console.log(this.food)
   },
   methods: {
-  }
+    beforeDrop(){
+
+    },
+    dropping(){
+
+    },
+    afterDrop(){
+      
+    }
+  },
+  computed: {
+    payClass() {
+      if (this.totalPrice < this.minPrice) {
+        return `not-enough`
+      } else {
+        return `enough`
+      }
+    },
+    totalPrice() {
+      let total = 0
+      this.selectFoods.forEach((food) => {
+        total += food.price * food.count
+      })
+      return total
+    },
+    totalCount() {
+      let count = 0
+      this.selectFoods.forEach((food) => {
+        count += food.count
+      })
+      return count
+    },
+    payDesc() {
+      if (this.totalPrice === 0) {
+        return `￥${this.minPrice}元起送`
+      } else if (this.totalPrice < this.minPrice) {
+        let diff = this.minPrice - this.totalPrice
+        return `还差${diff}元起送`
+      } else if (this.totalPrice >= this.minPrice) {
+        return `去结算`
+      }
+    },
+    listShow() {
+      if (!this.totalCount) {
+        this.fold = true  // 如果总数量为0，折叠fold设为true
+        return false      // 如果总数量为0，listShow设为false
+      }
+      let show = !this.fold
+      if (show) {
+          /* better-scroll是根据DOM处理逻辑的，要在$nextTick的回调
+          中执行，因为DOM渲染是异步的 */
+        this.$nextTick(() => {
+          if (!this.scroll) {
+            this.scroll = new BScroll(this.$refs.listContent, {
+              click: true
+            })
+          } else {
+            this.scroll.refresh()
+              /* refresh() 强制 scroll 重新计算，当 better-scroll 中的元素
+              发生变化的时候调用此方法，这样就不需要重新new一个新的better-scroll了
+              文档查看"https://github.com/ustbhuangyi/better-scroll" */
+          }
+        })
+      }
+      return show // 如果总数量大于0，listShow设为true
+    }
+  },
 }
 </script>
 

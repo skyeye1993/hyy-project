@@ -228,6 +228,10 @@ const weexConfig = {
           options: vueLoaderConfig({useVue: false})
         }],
         exclude: config.excludeModuleReg
+      },
+      {
+        test:/.(jpg|png)$/,
+        use:['url-loader']
       }
     ]
   },

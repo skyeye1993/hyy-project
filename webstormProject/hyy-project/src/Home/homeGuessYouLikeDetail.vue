@@ -19,7 +19,7 @@
                             <text style="color: darkgray;font-size: 28px;margin-right: 20px;margin-top: 10px;lines:2;text-overflow:ellipsis">{{food.subTitle}}</text>
                             <div style="flex-direction: row;justify-content: space-between;margin-top: 10px">
                                 <text style="color: crimson;font-size: 28px">月售{{food.sellCount}}</text>
-                                <Cartcontrol :food="food" @addCart="addCart" />
+                                <Cartcontrol :index="index" :food="food" @cartAdd="addCart" />
                             </div>
                             <text style="color: black;font-size: 28px;margin-top: 20px">￥{{food.price}}</text>
                         </div>
@@ -28,7 +28,7 @@
                 </div>
             </cell>
         </list>
-        <Shopcart ref="shopcart"></Shopcart>
+        <Shopcart ref="shopcart" :selectFoods="selectFoods"></Shopcart>
     </div>
 </template>
 
@@ -39,7 +39,8 @@
     var globalDefine = require('../globalDefine');
     var homeBottomCommonCell = require('./homeBottomCommonCell');
     var homeHotData = require('../resource/gusyoulikedetailTemp');
-    
+    var homeHotGoods = require('../resource/gusyoulikedetailTemp');
+
 
     var stream = weex.requireModule('stream');
     const modal = weex.requireModule('modal');
@@ -61,12 +62,10 @@
         computed: {
             selectFoods() {
                 let foods = []
-                this.goods.forEach((good) => {
-                    good.foods.forEach((food) => {
+                this.lists.forEach((food) => {
                     if (food.count) {
                         foods.push(food)
                     }
-                    })
                 })
                 return foods
             },
@@ -80,17 +79,6 @@
                 }
                 return 0
             },
-            selectFoods() {
-                let foods = []
-                this.goods.forEach((good) => {
-                    good.foods.forEach((food) => {
-                        if (food.count) {
-                            foods.push(food)
-                        }
-                    })
-                })
-                return foods
-            }
         },
         components:{
             homeBottomCommonCell,
@@ -125,8 +113,8 @@
                     return url.replace('w.h', '240.180');
                 }
             },
-            addCart(){
-
+            addCart(e){
+                console.log(this.lists)
             },
             onappear (event) {
             },

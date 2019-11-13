@@ -1,5 +1,5 @@
 <template lang="html">
-  <div class="cartcontrol">
+  <div class="cartcontrol" :style="{'flex-direction': (food.count==0 ? 'row-reverse':'row')}">
     <transition name="move">
       <div class="cart-decrease" v-show="food.count>0" @click.stop.prevent="decreaseCart($event)">
         <!-- <i class="inner icon-remove_circle_outline"></i> -->
@@ -9,18 +9,28 @@
     <div class="cart-count" v-show="food.count>0">
       {{food.count}}
     </div>
-    <div class="cart-add icon-add_circle" @click.stop.prevent="addCart($event)">
-        +
+    <div class="cart-add" @click.stop.prevent="addCart($event)">
+        <image :src="addImg" style="width:100%;height:100%;"></image>
     </div>
   </div>
 </template>
 
 
 <script>
+var globalDefine = require('../globalDefine');
+
 export default {
   props: {
     food: { // 购物车按钮的信息由父组件传入
       type: Object
+    },
+    index: {
+      type: Number
+    }
+  },
+  data(){
+    return {
+      addImg:globalDefine.apiUrl.resUrl + 'add_circle.png'
     }
   },
   created() {
@@ -40,7 +50,6 @@ export default {
       } else {
         this.food.count++
       }
-      console.log(this.food.count)
       this.$emit('cartAdd', event.target) // $emit派发的事件只能在当前组件监听,父组件不能监听到到
     },
     decreaseCart(event) {
@@ -57,11 +66,17 @@ export default {
 
 <style lang="scss">
 .cartcontrol {
-    font-size: 0;
+    width: 100px;
+    margin-right: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     .cart-decrease {
-        display: inline-block;
         padding: 6px;
+        width: 24px;
+        height: 24px;
         transition: translate3d(0,0,0);
+        background: blue;
         .inner {
             display: inline-block; // 动画的元素要有宽高，inline元素不能动画
             line-height: 24px;
@@ -85,22 +100,22 @@ export default {
         }
     }
     .cart-count {
-        display: inline-block;
-        vertical-align: top;
-        width: 12px;
+        width: 24px;
         padding-top: 6px;
         line-height: 24px;
         text-align: center;
-        font-size: 12px;
+        font-size: 24px;
         color: rgb(147,153,159);
     }
     .cart-add {
-        display: inline-block;
-        padding: 6px;
-        line-height: 24px;
-        font-size: 24px;
-        margin-right: 20px;
+        background: #000000;
+        width: 24px;
+        height: 24px;
         color: rgb(0,160,220);
+        img{
+          width: 100%;
+          height: 100%;
+        }
     }
 
 }
