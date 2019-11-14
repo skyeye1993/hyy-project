@@ -24,9 +24,6 @@ export default {
     food: { // 购物车按钮的信息由父组件传入
       type: Object
     },
-    index: {
-      type: Number
-    }
   },
   data(){
     return {

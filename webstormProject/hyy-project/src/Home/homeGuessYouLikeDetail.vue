@@ -28,7 +28,7 @@
                 </div>
             </cell>
         </list>
-        <Shopcart ref="shopcart" :selectFoods="selectFoods"></Shopcart>
+        <Shopcart ref="shopcart" :selectFoods="selectFoods" :deliveryPrice="seller.deliveryPrice" :min-price="seller.minPrice"></Shopcart>
     </div>
 </template>
 
@@ -40,6 +40,7 @@
     var homeBottomCommonCell = require('./homeBottomCommonCell');
     var homeHotData = require('../resource/gusyoulikedetailTemp');
     var homeHotGoods = require('../resource/gusyoulikedetailTemp');
+    var homeHotSeller = require('../resource/gusyoulikeSeller');
 
 
     var stream = weex.requireModule('stream');
@@ -47,16 +48,17 @@
     const dom = weex.requireModule('dom');
 
     export default {
-        props: {
-            seller: {
-                type: Object
-            }
-        },
+        // props: {
+        //     seller: {
+        //         type: Object
+        //     }
+        // },
         data () {
             return{
                 rightViewBtttomImage:globalDefine.apiUrl.resUrl + 'cnxh.png',
                 lists: homeHotData,
                 listHeight:'',
+                seller:homeHotSeller.seller
             }
         },
         computed: {
@@ -114,6 +116,7 @@
                 }
             },
             addCart(e){
+                this._drop(e) // 小球动画,传递element
                 console.log(this.lists)
             },
             onappear (event) {
@@ -124,6 +127,12 @@
                 // this.listHeight = e.contentSize.height;
             },
             toggle: function(item) {
+            },
+            _drop(target) {  // 命名习惯，私有方法前面加下划线
+                // 性能优化，小球动画异步执行，否则同步的话，第一次执行的时候还有减号的动画，会卡顿
+                this.$nextTick(() => {
+                    this.$refs.shopcart.drop(target)  // 小球动画,传递element作为参数传给shopcart组件的drop方法
+                })
             }
         }
     }

@@ -66,6 +66,9 @@
 
 
 <script>
+import cartcontrol from './cartcontrol.vue'
+import BScroll from 'better-scroll'
+
 export default {
     data() {
     return {
@@ -106,16 +109,74 @@ export default {
   },
   created() {
     // console.log(this.food)
+    console.log(this.deliveryPrice)
   },
   methods: {
-    beforeDrop(){
-
+    drop(el) { // el为父组件传进来的，按钮的element
+      this.balls.forEach((ball) => {
+        if (!ball.show) {
+          ball.show = true
+              // 当show设为true的时候，动画就开始了，步骤beforeDrop ==> dropping ==> afterDrop(通过JS动画钩子)
+          ball.el = el // 将按钮的element添加到ball的属性中保存起来
+          this.dropBalls.push(ball)
+        }
+      })
     },
-    dropping(){
-
+    beforeDrop(el) {
+      let count = this.balls.length
+      while (count--) { // pop配合while，把balls做成队列的形式，要从后往前取小球
+        let ball = this.balls[count]
+        if (ball.show) {
+          let rect = ball.el.getBoundingClientRect() // 获取相对于视口的位置
+          let x = rect.left - 32 // 计算小球发出点和落点的x轴长度
+          let y = -(window.innerHeight - rect.top - 22) // 计算小球发出点和落点的y轴高度
+          // console.log(x, y)
+          el.style.display = '' // 原来的小球display为none,现在设置成空,让其可见
+          // el.style.webkitTransform = `translate3d(0,${y}px,0)`
+              // 兼容webkit渲染引擎，因为直接写transfrom，webkit引擎没有出现效果
+          el.style.transform = `translate3d(0,${y}px,0)`
+          let inner = el.getElementsByClassName('inner-hook')[0]
+          // inner.style.webkitTransform = `translate3d(${x}px,0,0)` // 兼容webkit渲染引擎
+          inner.style.transform = `translate3d(${x}px,0,0)`
+        }
+      }
     },
-    afterDrop(){
-      
+    dropping(el, done) { // 回调函数done看文档"https://cn.vuejs.org/v2/guide/transitions.html#JavaScript-钩子"
+      /* eslint-disable no-unused-vars */
+      let rf = el.offestHeight // 触发浏览器重绘，由于rf变量声明但未使用，添加上面那行注释
+      this.$nextTick(() => {
+        el.style.webkitTransform = `translate3d(0,0,0)` // 兼容webkit渲染引擎，因为直接写transfrom，webkit引擎没有出现效果
+        el.style.transform = `translate3d(0,0,0)`
+        let inner = el.getElementsByClassName('inner-hook')[0]
+        inner.style.webkitTransform = `translate3d(0,0,0)` // 兼容webkit渲染引擎
+        inner.style.transform = `translate3d(0,0,0)`
+        el.addEventListener('transitionend', done)
+            // transitionend事件表示transition变化完成了，回调函数done告诉Vue动画结束
+      })
+    },
+    afterDrop(el) {
+      let ball = this.dropBalls.pop() // pop配合while，把balls做成队列的形式，要从后往前取小球
+      if (ball) {
+        ball.show = false
+        el.style.display = 'none'
+      }
+    },
+    toggleList() {
+      if (!this.totalCount) {
+        return   // 如果没有选择商品，则点击无效
+      }
+      this.fold = !this.fold
+    },
+    empty() {
+      this.selectFoods.forEach((food) => {
+        food.count = 0
+      })
+    },
+    pay() {
+      if (this.totalPrice < this.minPrice) {
+        return
+      }
+      alert(`支付${this.totalPrice}元`)
     }
   },
   computed: {
@@ -128,6 +189,7 @@ export default {
     },
     totalPrice() {
       let total = 0
+      console.log(this.selectFoods)
       this.selectFoods.forEach((food) => {
         total += food.price * food.count
       })
@@ -175,6 +237,9 @@ export default {
       return show // 如果总数量大于0，listShow设为true
     }
   },
+  components:{
+    cartcontrol
+  }
 }
 </script>
 
@@ -191,10 +256,13 @@ export default {
     background: #ccc;
     .content {
         display: flex;
+        flex-direction: row;
         height: 100%;
         color: rgba(255,255,255,0.4);
         background: #141d27;
         .content-left {
+            display: flex;
+            flex-direction: row;
             flex-grow: 1;
             font-size: 0;
             .logo-wrapper {
@@ -263,6 +331,8 @@ export default {
                 margin: 12px 0 0 12px;
                 line-height: 24px;
                 font-size: 12px;
+                color: rgba(255,255,255,0.4);
+
             }
         }
         .content-right {
