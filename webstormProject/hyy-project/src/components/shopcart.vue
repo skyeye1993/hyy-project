@@ -4,7 +4,7 @@
       <div class="content-left" @click.stop.prevent="toggleList">
         <div class="logo-wrapper">
           <div class="logo" :class="{'highlight': totalCount > 0}">
-            <i class="icon-shopping_cart"></i>
+            <image class="logoImg" :src="shopImg"></image>
           </div>
           <div class="num" v-show="totalCount>0">
             {{totalCount}}
@@ -68,10 +68,12 @@
 <script>
 import cartcontrol from './cartcontrol.vue'
 import BScroll from 'better-scroll'
+var globalDefine = require('../globalDefine');
 
 export default {
     data() {
     return {
+      shopImg:globalDefine.apiUrl.resUrl + 'icon_shopping_cart.png',
       balls: [{ // 存储可以被开始动画的小球，false的才能开始将其转变为true开始动画！而transition动画只对v-if，v-show和v-for有效
         show: false
       }, {
@@ -283,6 +285,10 @@ export default {
                     height: 100%;
                     border-radius: 50%;
                     background: #2b333b;
+                    .logoImg{
+                      width: 100%;
+                      height: 100%;
+                    }
                     &.highlight {
                         background: rgb(0,160,220);
                         .icon-shopping_cart {
@@ -419,7 +425,7 @@ export default {
           }
           .price {
             position: absolute;
-            right: 90px;
+            right: 150px;
             bottom: 12px;
             line-height: 24px;
             font-weight: 14px;
